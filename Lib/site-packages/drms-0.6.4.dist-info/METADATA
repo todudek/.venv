@@ -1,0 +1,116 @@
+Metadata-Version: 2.1
+Name: drms
+Version: 0.6.4
+Summary: Access HMI, AIA and MDI data with Python from the Standford JSOC DRMS
+Home-page: https://sunpy.org
+Author: The SunPy Community
+Author-email: sunpy@googlegroups.com
+License: BSD 2-Clause
+Keywords: solar physics,solar,science,data
+Platform: any
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Natural Language :: English
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Topic :: Scientific/Engineering :: Astronomy
+Classifier: Topic :: Scientific/Engineering :: Physics
+Provides: drms
+Requires-Python: >=3.8
+Description-Content-Type: text/x-rst
+License-File: LICENSE.rst
+Requires-Dist: numpy
+Requires-Dist: pandas
+Provides-Extra: all
+Provides-Extra: dev
+Requires-Dist: pytest-astropy ; extra == 'dev'
+Requires-Dist: tox ; extra == 'dev'
+Requires-Dist: astropy ; extra == 'dev'
+Requires-Dist: matplotlib ; extra == 'dev'
+Requires-Dist: sphinx ; extra == 'dev'
+Requires-Dist: sphinx-automodapi ; extra == 'dev'
+Requires-Dist: sphinx-gallery ; extra == 'dev'
+Requires-Dist: sphinx-changelog ; extra == 'dev'
+Requires-Dist: sunpy-sphinx-theme ; extra == 'dev'
+Requires-Dist: towncrier (<22.12.0) ; extra == 'dev'
+Provides-Extra: docs
+Requires-Dist: astropy ; extra == 'docs'
+Requires-Dist: matplotlib ; extra == 'docs'
+Requires-Dist: sphinx ; extra == 'docs'
+Requires-Dist: sphinx-automodapi ; extra == 'docs'
+Requires-Dist: sphinx-gallery ; extra == 'docs'
+Requires-Dist: sphinx-changelog ; extra == 'docs'
+Requires-Dist: sunpy-sphinx-theme ; extra == 'docs'
+Requires-Dist: towncrier (<22.12.0) ; extra == 'docs'
+Provides-Extra: tests
+Requires-Dist: pytest-astropy ; extra == 'tests'
+Requires-Dist: tox ; extra == 'tests'
+
+====
+drms
+====
+
+`Docs <https://docs.sunpy.org/projects/drms/>`__ |
+`Tutorial <https://docs.sunpy.org/projects/drms/en/latest/tutorial.html>`__ |
+`Github <https://github.com/sunpy/drms>`__ |
+`PyPI <https://pypi.org/project/drms/>`__
+
+|JOSS| |Zenodo|
+
+.. |JOSS| image:: https://joss.theoj.org/papers/10.21105/joss.01614/status.svg
+   :target: https://doi.org/10.21105/joss.01614
+.. |Zenodo| image:: https://zenodo.org/badge/58651845.svg
+   :target: https://zenodo.org/badge/latestdoi/58651845
+
+The ``drms`` module provides an easy-to-use interface for accessing HMI, AIA and MDI data with Python.
+It uses the publicly accessible `JSOC <http://jsoc.stanford.edu/>`__ DRMS server by default, but can also be used with local `NetDRMS <http://jsoc.stanford.edu/netdrms/>`__ sites.
+More information, including a detailed tutorial, is available in the `Documentation <https://docs.sunpy.org/projects/drms/>`__.
+
+Getting Help
+------------
+For more information or to ask questions about ``drms``, check out:
+
+-  `drms Documentation <https://docs.sunpy.org/projects/drms/en/latest/>`__
+
+.. _drms Documentation: https://docs.sunpy.org/projects/drms/en/latest/
+
+Contributing
+------------
+If you would like to get involved, start by joining the `SunPy Chat`_ and read our `Newcomers' guide <https://docs.sunpy.org/en/latest/dev_guide/newcomers.html>`__.
+Help is always welcome so let us know what you like to work on, or check out the `issues page <https://github.com/sunpy/drms/issues>`__ for a list of known outstanding items.
+
+Citation
+--------
+If you use ``drms`` in your work, please cite our `paper <https://doi.org/10.21105/joss.01614>`__.
+
+.. code :: bibtex
+
+    @article{Glogowski2019,
+      doi = {10.21105/joss.01614},
+      url = {https://doi.org/10.21105/joss.01614},
+      year = {2019},
+      publisher = {The Open Journal},
+      volume = {4},
+      number = {40},
+      pages = {1614},
+      author = {Kolja Glogowski and Monica G. Bobra and Nitin Choudhary and Arthur B. Amezcua and Stuart J. Mumford},
+      title = {drms: A Python package for accessing HMI and AIA data},
+      journal = {Journal of Open Source Software}
+    }
+
+Code of Conduct (CoC)
+---------------------
+
+When you are interacting with the SunPy community you are asked to follow our `code of conduct <https://docs.sunpy.org/en/latest/code_of_conduct.html>`__.
+
+Acknowledgements
+----------------
+Kolja Glogowski has received funding from the European Research Council under the European Union's Seventh Framework Programme (FP/2007-2013) / ERC Grant Agreement no. 307117.
+
+.. _SunPy Chat: https://openastronomy.element.io/#/room/#sunpy:openastronomy.org
