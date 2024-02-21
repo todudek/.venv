@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from datetime import datetime, timedelta  # Dodano import timedelta
 import os
 
-# Funkcja do tworzenia pliku tekstowego z informacjami o obrazie
+# Funkcja do tworzenia pliku tekstowego z informacjami o obrazie test
 def create_image_info_file(file_path, sun_map):
     info_file_path = f"{file_path}.txt"
     with open(info_file_path, "w") as f:
