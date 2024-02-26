@@ -16,6 +16,7 @@ class SDOApp(tk.Tk):
         self.wavelength_options = ['94', '131', '171', '193', '211', '304', '335', '1600', '1700', '4500', '6173']
         self.fetched_files = []
         self.image_dates = {}
+        self.image_wavelengths = {}
         self.image_canvas_refs = []
 
         top_frame = tk.Frame(self)
@@ -78,6 +79,7 @@ class SDOApp(tk.Tk):
                 for file in files:
                     self.fetched_files.append(file)
                     self.image_dates[file] = target_time.strftime('%Y-%m-%d %H:%M')
+                    self.image_wavelengths[file] = wavelength
 
             self.progress['value'] = i + 1
             self.update_idletasks()
@@ -100,6 +102,7 @@ class SDOApp(tk.Tk):
 
             self.image_canvas_refs.append(canvas)
             self.image_dates[canvas] = self.image_dates[file_path]
+            self.image_wavelengths[canvas] = self.image_wavelengths[file_path]
 
         self.label_button['state'] = 'normal'
 
@@ -133,17 +136,19 @@ class SDOApp(tk.Tk):
             ax.figure.canvas.draw()
             return
 
-        self.save_label_to_file(comment, x0, y0, x1, y1, self.image_dates[ax.figure.canvas])
-        self.display_comment_and_coords(comment, x0, y0, x1, y1)
+        image_date_time = self.image_dates[ax.figure.canvas]
+        wavelength = self.image_wavelengths[ax.figure.canvas]
+        self.save_label_to_file(comment, x0, y0, x1, y1, image_date_time, wavelength)
+        self.display_comment_and_coords(comment, x0, y0, x1, y1, wavelength)
 
-    def save_label_to_file(self, comment, x0, y0, x1, y1, image_date_time):
-        with open("labels.txt", "a") as file:
-            file.write(f"Date/Time: {image_date_time}, Comment: {comment}, Coordinates: ({x0:.2f}, {y0:.2f}), ({x1:.2f}, {y1:.2f})\n")
+    def save_label_to_file(self, comment, x0, y0, x1, y1, image_date_time, wavelength):
+        with open("labels.txt", "a", encoding="utf-8") as file:
+            file.write(f"Date/Time: {image_date_time}, Wavelength: {wavelength}Å, Comment: {comment}, Coordinates: ({x0:.2f}, {y0:.2f}), ({x1:.2f}, {y1:.2f})\n")
 
-    def display_comment_and_coords(self, comment, x0, y0, x1, y1):
+    def display_comment_and_coords(self, comment, x0, y0, x1, y1, wavelength):
         label_frame = tk.Frame(self.bottom_frame)
         label_frame.pack(fill=tk.X)
-        label_text = f"Comment: {comment} | Coordinates: x0={x0:.2f}, y0={y0:.2f}, x1={x1:.2f}, y1={y1:.2f}"
+        label_text = f"Wavelength: {wavelength}Å, Comment: {comment} | Coordinates: x0={x0:.2f}, y0={y0:.2f}, x1={x1:.2f}, y1={y1:.2f}"
         tk.Label(label_frame, text=label_text, fg="red").pack()
 
 if __name__ == "__main__":
