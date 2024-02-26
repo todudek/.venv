@@ -26,17 +26,17 @@ class SDOApp(tk.Tk):
         self.define_top_frame_elements(top_frame)
 
     def define_top_frame_elements(self, top_frame):
-        tk.Label(top_frame, text="Start Date (YYYY-MM-DD):").pack(side="left")
-        self.start_date_entry = ttk.Entry(top_frame)
-        self.start_date_entry.pack(side="left")
+        tk.Label(top_frame, text="Date (YYYY-MM-DD):").pack(side="left")
+        self.date_entry = ttk.Entry(top_frame)
+        self.date_entry.pack(side="left")
 
-        tk.Label(top_frame, text="End Date (YYYY-MM-DD):").pack(side="left")
-        self.end_date_entry = ttk.Entry(top_frame)
-        self.end_date_entry.pack(side="left")
+        tk.Label(top_frame, text="Start Time (HH:MM):").pack(side="left")
+        self.start_time_entry = ttk.Entry(top_frame)
+        self.start_time_entry.pack(side="left")
 
-        tk.Label(top_frame, text="Time (HH:MM):").pack(side="left")
-        self.time_entry = ttk.Entry(top_frame)
-        self.time_entry.pack(side="left")
+        tk.Label(top_frame, text="Interval (HH:MM):").pack(side="left")
+        self.interval_entry = ttk.Entry(top_frame)
+        self.interval_entry.pack(side="left")
 
         tk.Label(top_frame, text="Wavelength (Å):").pack(side="left")
         self.wavelength_var = tk.StringVar()
@@ -54,32 +54,30 @@ class SDOApp(tk.Tk):
         self.label_button.pack(side="left")
 
     def on_ok(self):
-        start_date = self.start_date_entry.get()
-        end_date = self.end_date_entry.get()
-        time_str = self.time_entry.get()
+        date_str = self.date_entry.get()
+        start_time_str = self.start_time_entry.get()
+        interval_str = self.interval_entry.get()
         wavelength = self.wavelength_var.get()
-        self.fetch_images(start_date, end_date, time_str, wavelength)
+        self.fetch_images(date_str, start_time_str, interval_str, wavelength)
 
-    def fetch_images(self, start_date, end_date, time_str, wavelength):
+    def fetch_images(self, date_str, start_time_str, interval_str, wavelength):
         wavelength_unit = int(wavelength) * u.angstrom
-        start_dt = datetime.strptime(start_date, '%Y-%m-%d')
-        end_dt = datetime.strptime(end_date, '%Y-%m-%d')
-        delta = end_dt - start_dt
+        hours, minutes = map(int, interval_str.split(":"))
+        interval = timedelta(hours=hours, minutes=minutes)
 
-        total_images = delta.days + 1
-        self.progress['maximum'] = total_images
+        start_time = datetime.strptime(f"{date_str} {start_time_str}", '%Y-%m-%d %H:%M')
+        self.progress['maximum'] = 3
 
-        for i in range(total_images):
-            day = start_dt + timedelta(days=i)
-            date_str = day.strftime('%Y-%m-%d')
-            time_range = a.Time(f'{date_str}T{time_str}', f'{date_str}T{time_str}')
+        for i in range(3):
+            target_time = start_time + interval * i
+            time_range = a.Time(target_time, target_time + timedelta(minutes=1))
             result = Fido.search(time_range, a.Instrument("aia"), a.Wavelength(wavelength_unit))
             
             if len(result) > 0:
                 files = Fido.fetch(result[0, 0])
                 for file in files:
                     self.fetched_files.append(file)
-                    self.image_dates[file] = f"{date_str} {time_str}"
+                    self.image_dates[file] = target_time.strftime('%Y-%m-%d %H:%M')
 
             self.progress['value'] = i + 1
             self.update_idletasks()
@@ -113,28 +111,30 @@ class SDOApp(tk.Tk):
     def on_press(self, event):
         self.rect_start = (event.xdata, event.ydata)
 
-    def on_release(self, event):
+        for canvas in self.image_canvas_refs:
+            if event.inaxes in canvas.figure.axes:
+                ax = event.inaxes
+                canvas.mpl_connect("button_release_event", lambda event, ax=ax: self.on_release(event, ax))
+
+    def on_release(self, event, ax):
         if not self.rect_start or not event.xdata or not event.ydata:
             return
         rect_end = (event.xdata, event.ydata)
         x0, y0 = self.rect_start
         x1, y1 = rect_end
 
-        for canvas in self.image_canvas_refs:
-            if event.inaxes in canvas.figure.axes:
-                ax = event.inaxes
-                rect = plt.Rectangle((min(x0, x1), min(y0, y1)), abs(x1 - x0), abs(y1 - y0), linewidth=1, edgecolor='r', facecolor='none')
-                rect_patch = ax.add_patch(rect)
-                canvas.draw()
+        rect = plt.Rectangle((min(x0, x1), min(y0, y1)), abs(x1 - x0), abs(y1 - y0), linewidth=1, edgecolor='r', facecolor='none')
+        ax.add_patch(rect)
+        ax.figure.canvas.draw()
 
-                comment = simpledialog.askstring("Label Comment", "Enter a comment for the label:")
-                if comment is None:  # User clicked "Cancel"
-                    rect_patch.remove()
-                    canvas.draw()
-                    return
+        comment = simpledialog.askstring("Label Comment", "Enter a comment for the label:")
+        if comment is None:  # User clicked "Cancel"
+            rect.remove()
+            ax.figure.canvas.draw()
+            return
 
-                self.save_label_to_file(comment, x0, y0, x1, y1, self.image_dates[canvas])
-                self.display_comment_and_coords(comment, x0, y0, x1, y1)
+        self.save_label_to_file(comment, x0, y0, x1, y1, self.image_dates[ax.figure.canvas])
+        self.display_comment_and_coords(comment, x0, y0, x1, y1)
 
     def save_label_to_file(self, comment, x0, y0, x1, y1, image_date_time):
         with open("labels.txt", "a") as file:

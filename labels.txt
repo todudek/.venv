@@ -2,3 +2,4 @@ Date/Time: 2024-02-22 15:00, Comment: ciekawe zjawisko, Coordinates: (200.26, 78
 Date/Time: 2024-02-23 15:00, Comment: 12e, Coordinates: (293.16, 776.09), (456.26, 557.25)
 Date/Time: 2024-02-23 12:00, Comment: 123, Coordinates: (258.06, 788.48), (526.45, 575.83)
 Date/Time: 2024-02-22 12:00, Comment: start, Coordinates: (156.72, 805.12), (450.06, 589.67)
+Date/Time: 2024-02-22 08:30, Comment: sad, Coordinates: (154.84, 771.96), (390.19, 586.16)
