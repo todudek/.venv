@@ -34,3 +34,5 @@ Date/Time: 2024-02-21 04:00, Wavelength: 131Å, Comment: , Coordinates: (1569.20
 Date/Time: 2024-02-21 04:00, Wavelength: 131Å, Comment: , Coordinates: (808.05, 3170.27), (2480.43, 1744.45)
 Date/Time: 2024-02-21 04:00, Wavelength: 131Å, Comment: , Coordinates: (2566.20, 3727.73), (3134.38, 2966.58)
 Date/Time: 2024-02-21 04:00, Wavelength: 131Å, Comment: , Coordinates: (3005.73, 1208.43), (2094.50, 1701.57)
+Date/Time: 2024-02-25 08:00, Wavelength: 171Å, Comment: zjawisko 1, Coordinates: (381.94, 819.45), (652.39, 633.64)
+Date/Time: 2024-02-25 09:00, Wavelength: 171Å, Comment: zjawisko 2, Coordinates: (381.85, 818.33), (635.54, 522.36)
