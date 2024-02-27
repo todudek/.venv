@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, simpledialog, filedialog
+from tkinter import ttk, simpledialog, filedialog, messagebox
 from datetime import datetime, timedelta
 import astropy.units as u
 from sunpy.net import Fido, attrs as a
@@ -42,7 +42,7 @@ class SDOApp(tk.Tk):
 
         tk.Label(top_frame, text="Wavelength (Å):").pack(side="left")
         self.wavelength_var = tk.StringVar()
-        self.wavelength_combobox = ttk.Combobox(top_frame, textvariable=self.wavelength_var, values=self.wavelength_options)
+        self.wavelength_combobox = ttk.Combobox(top_frame, textvariable=self.wavelength_var, values=self.wavelength_options, state='readonly')
         self.wavelength_combobox.pack(side="left", expand=True)
         self.wavelength_combobox.set('171')
 
@@ -55,12 +55,22 @@ class SDOApp(tk.Tk):
         self.label_button = ttk.Button(top_frame, text="Label Images", state='disabled', command=self.start_labeling)
         self.label_button.pack(side="left")
 
+    def validate_date_time(self, date_str, time_str):
+        try:
+            datetime.strptime(f"{date_str} {time_str}", '%Y-%m-%d %H:%M')
+            return True
+        except ValueError:
+            messagebox.showerror("Error", "Invalid date or time format. Please use YYYY-MM-DD for date and HH:MM for time.")
+            return False
+
     def on_ok(self):
         date_str = self.date_entry.get()
         start_time_str = self.start_time_entry.get()
         interval_str = self.interval_entry.get()
         wavelength = self.wavelength_var.get()
-        self.fetch_images(date_str, start_time_str, interval_str, wavelength)
+
+        if self.validate_date_time(date_str, start_time_str):
+            self.fetch_images(date_str, start_time_str, interval_str, wavelength)
 
     def fetch_images(self, date_str, start_time_str, interval_str, wavelength):
         wavelength_unit = int(wavelength) * u.angstrom
