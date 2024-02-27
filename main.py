@@ -1,11 +1,12 @@
 import tkinter as tk
-from tkinter import ttk, simpledialog
+from tkinter import ttk, simpledialog, filedialog
 from datetime import datetime, timedelta
 import astropy.units as u
 from sunpy.net import Fido, attrs as a
 from sunpy.map import Map
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import os
 
 class SDOApp(tk.Tk):
     def __init__(self):
@@ -109,15 +110,20 @@ class SDOApp(tk.Tk):
     def start_labeling(self):
         for canvas in self.image_canvas_refs:
             canvas.mpl_connect("button_press_event", self.on_press)
-            canvas.mpl_connect("button_release_event", self.on_release)
 
     def on_press(self, event):
         self.rect_start = (event.xdata, event.ydata)
 
         for canvas in self.image_canvas_refs:
             if event.inaxes in canvas.figure.axes:
-                ax = event.inaxes
-                canvas.mpl_connect("button_release_event", lambda event, ax=ax: self.on_release(event, ax))
+                # Zmieniono sposób przypisywania funkcji zwrotnej on_release
+                # Teraz używamy funkcji lambda do przekazania aktualnego kontekstu osi (ax) do on_release
+                canvas.mpl_connect("motion_notify_event", lambda event, ax=event.inaxes: self.on_drag(event, ax))
+                canvas.mpl_connect("button_release_event", lambda event, ax=event.inaxes: self.on_release(event, ax))
+
+    def on_drag(self, event, ax):
+        # Ta funkcja może być użyta do aktualizacji rysowania prostokąta podczas przeciągania, jeśli to potrzebne
+        pass
 
     def on_release(self, event, ax):
         if not self.rect_start or not event.xdata or not event.ydata:
@@ -136,19 +142,37 @@ class SDOApp(tk.Tk):
             ax.figure.canvas.draw()
             return
 
+        # Upewnijmy się, że folder labeled_images istnieje
+        labeled_images_dir = 'labeled_images'
+        os.makedirs(labeled_images_dir, exist_ok=True)
+
         image_date_time = self.image_dates[ax.figure.canvas]
         wavelength = self.image_wavelengths[ax.figure.canvas]
-        self.save_label_to_file(comment, x0, y0, x1, y1, image_date_time, wavelength)
-        self.display_comment_and_coords(comment, x0, y0, x1, y1, wavelength)
+        label_info = f"Date: {image_date_time}, Wavelength: {wavelength} Å, Comment: {comment}"
+        print(label_info)  # Można to zastąpić dowolną akcją do zapisu lub przetwarzania informacji o etykiecie.
 
-    def save_label_to_file(self, comment, x0, y0, x1, y1, image_date_time, wavelength):
-        with open("labels.txt", "a", encoding="utf-8") as file:
-            file.write(f"Date/Time: {image_date_time}, Wavelength: {wavelength}Å, Comment: {comment}, Coordinates: ({x0:.2f}, {y0:.2f}), ({x1:.2f}, {y1:.2f})\n")
+        # Poprawka ścieżki do zapisu obrazu
+        safe_image_date_time = image_date_time.replace(":", "-")
+        labeled_image_path = os.path.join(labeled_images_dir, f'labeled_{safe_image_date_time}_{wavelength}.png')
 
-    def display_comment_and_coords(self, comment, x0, y0, x1, y1, wavelength):
+        try:
+            ax.figure.savefig(labeled_image_path)
+            print(f"Image saved to {labeled_image_path}")
+        except Exception as e:
+            print(f"Error saving image: {e}")
+
+        self.rect_start = None  # Resetowanie stanu startowego po zapisie
+        self.save_label_to_file(comment, x0, y0, x1, y1, self.image_dates[ax.figure.canvas])
+        self.display_comment_and_coords(comment, x0, y0, x1, y1)
+
+    def save_label_to_file(self, comment, x0, y0, x1, y1, image_date_time):
+        with open("labels.txt", "a") as file:
+            file.write(f"Date/Time: {image_date_time}, Comment: {comment}, Coordinates: ({x0:.2f}, {y0:.2f}), ({x1:.2f}, {y1:.2f})\n")
+
+    def display_comment_and_coords(self, comment, x0, y0, x1, y1):
         label_frame = tk.Frame(self.bottom_frame)
         label_frame.pack(fill=tk.X)
-        label_text = f"Wavelength: {wavelength}Å, Comment: {comment} | Coordinates: x0={x0:.2f}, y0={y0:.2f}, x1={x1:.2f}, y1={y1:.2f}"
+        label_text = f"Comment: {comment} | Coordinates: x0={x0:.2f}, y0={y0:.2f}, x1={x1:.2f}, y1={y1:.2f}"
         tk.Label(label_frame, text=label_text, fg="red").pack()
 
 if __name__ == "__main__":
