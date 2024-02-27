@@ -116,13 +116,10 @@ class SDOApp(tk.Tk):
 
         for canvas in self.image_canvas_refs:
             if event.inaxes in canvas.figure.axes:
-                # Zmieniono sposób przypisywania funkcji zwrotnej on_release
-                # Teraz używamy funkcji lambda do przekazania aktualnego kontekstu osi (ax) do on_release
                 canvas.mpl_connect("motion_notify_event", lambda event, ax=event.inaxes: self.on_drag(event, ax))
                 canvas.mpl_connect("button_release_event", lambda event, ax=event.inaxes: self.on_release(event, ax))
 
     def on_drag(self, event, ax):
-        # Ta funkcja może być użyta do aktualizacji rysowania prostokąta podczas przeciągania, jeśli to potrzebne
         pass
 
     def on_release(self, event, ax):
@@ -149,7 +146,7 @@ class SDOApp(tk.Tk):
         image_date_time = self.image_dates[ax.figure.canvas]
         wavelength = self.image_wavelengths[ax.figure.canvas]
         label_info = f"Date: {image_date_time}, Wavelength: {wavelength} Å, Comment: {comment}"
-        print(label_info)  # Można to zastąpić dowolną akcją do zapisu lub przetwarzania informacji o etykiecie.
+        print(label_info)
 
         # Poprawka ścieżki do zapisu obrazu
         safe_image_date_time = image_date_time.replace(":", "-")
@@ -162,17 +159,17 @@ class SDOApp(tk.Tk):
             print(f"Error saving image: {e}")
 
         self.rect_start = None  # Resetowanie stanu startowego po zapisie
-        self.save_label_to_file(comment, x0, y0, x1, y1, self.image_dates[ax.figure.canvas])
-        self.display_comment_and_coords(comment, x0, y0, x1, y1)
+        self.save_label_to_file(comment, x0, y0, x1, y1, self.image_dates[ax.figure.canvas], self.image_wavelengths[ax.figure.canvas])
+        self.display_comment_and_coords(comment, x0, y0, x1, y1, self.image_wavelengths[ax.figure.canvas])
 
-    def save_label_to_file(self, comment, x0, y0, x1, y1, image_date_time):
-        with open("labels.txt", "a") as file:
-            file.write(f"Date/Time: {image_date_time}, Comment: {comment}, Coordinates: ({x0:.2f}, {y0:.2f}), ({x1:.2f}, {y1:.2f})\n")
+    def save_label_to_file(self, comment, x0, y0, x1, y1, image_date_time, wavelength):
+        with open("labels.txt", "a", encoding="utf-8") as file:
+            file.write(f"Date/Time: {image_date_time}, Wavelength: {wavelength}Å, Comment: {comment}, Coordinates: ({x0:.2f}, {y0:.2f}), ({x1:.2f}, {y1:.2f})\n")
 
-    def display_comment_and_coords(self, comment, x0, y0, x1, y1):
+    def display_comment_and_coords(self, comment, x0, y0, x1, y1, wavelength):
         label_frame = tk.Frame(self.bottom_frame)
         label_frame.pack(fill=tk.X)
-        label_text = f"Comment: {comment} | Coordinates: x0={x0:.2f}, y0={y0:.2f}, x1={x1:.2f}, y1={y1:.2f}"
+        label_text = f"Wavelength: {wavelength}Å, Comment: {comment} | Coordinates: x0={x0:.2f}, y0={y0:.2f}, x1={x1:.2f}, y1={y1:.2f}"
         tk.Label(label_frame, text=label_text, fg="red").pack()
 
 if __name__ == "__main__":

@@ -1,1 +1,3 @@
-Date/Time: 2024-02-25 00:30, Comment: test, Coordinates: (359.23, 838.03), (588.39, 606.80)
+Date/Time: 2024-02-24 00:30, Wavelength: 171Å, Comment: zjawisko 1, Coordinates: (270.45, 788.48), (503.74, 641.90)
+Date/Time: 2024-02-24 00:30, Wavelength: 171Å, Comment: zjawisko 1, Coordinates: (256.00, 800.87), (538.84, 573.77)
+Date/Time: 2024-02-24 01:30, Wavelength: 171Å, Comment: zjawisko 2, Coordinates: (257.65, 794.54), (659.32, 559.36)
